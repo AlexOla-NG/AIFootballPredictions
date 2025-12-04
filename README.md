@@ -136,7 +136,7 @@ To set up the environment for this project, follow these steps:
 To download and merge football match data, run the `data_acquisition.py` script:
 
 ```bash
-python scripts/data_acquisition.py --leagues E0 I1 SP1 F1 D1 --seasons 2425 2324 2223 --raw_data_output_dir data/raw
+python scripts/data_acquisition.py --leagues E0 I1 SP1 F1 D1 --seasons 2526 2425 2324 2223 --raw_data_output_dir data/raw
 ```
 This script downloads match data from [football-data.co.uk](https://www.football-data.co.uk/) for the specified leagues and seasons, merges them, and saves the results to the specified output directory.
 
@@ -147,7 +147,7 @@ To avoid error please see the [Supported Leagues](#supported-leagues) sections.
 Once the raw data is downloaded, preprocess it by running the `data_preprocessing.py` script:
 
 ```bash
-python scripts/data_preprocessing.py --raw_data_input_dir data/raw --processed_data_output_dir data/processed --num_features 20 --clustering_threshold 0.5
+python scripts/data_preprocessing.py --raw_data_input_dir data/raw --processed_data_output_dir data/processed --num_features 50 --clustering_threshold 0.5
 ```
 This script processes each CSV file in the input folder, performs feature engineering (creating corner statistics features), selects relevant features while addressing feature correlation, handles missing values, and saves the processed data with both goal and corner prediction targets.
 
@@ -217,12 +217,12 @@ To predict the outcomes for upcoming matches and generate a formatted message, r
 
 **For goals predictions only:**
 ```bash
-python scripts/make_predictions_enhanced.py --input_leagues_models_dir models --input_data_predict_dir data/processed --final_predictions_out_file final_predictions.txt --next_matches data/next_matches.json
+python scripts/make_predictions_enhanced.py --input_leagues_models_dir models --input_data_predict_dir data/processed --final_predictions_out_file data/final_predictions.txt --next_matches data/next_matches.json
 ```
 
 **For both goals and corners predictions:**
 ```bash
-python scripts/make_predictions_enhanced.py --input_leagues_models_dir models --input_data_predict_dir data/processed --final_predictions_out_file final_predictions_with_corners.txt --next_matches data/next_matches.json --predict_corners
+python scripts/make_predictions_enhanced.py --input_leagues_models_dir models --input_data_predict_dir data/processed --final_predictions_out_file data/final_predictions_with_corners.txt --next_matches data/next_matches.json --predict_corners
 ```
 
 This script will:
