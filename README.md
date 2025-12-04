@@ -1,9 +1,9 @@
 # AIFootballPredictions
 
-🎯 **AI Football Predictions: Will There Be Over 2.5 Goals?** 🎯
+🎯 **AI Football Predictions: Goals & Corners** 🎯
 
 Check out the latest predictions for the upcoming football matches! We've analyzed the data and here are our thoughts:
- PREDICTIONS DONE: 2025-02-28 
+ PREDICTIONS DONE: 2025-12-04 
 
 **Premier League**:
 
@@ -63,8 +63,9 @@ Check out the latest predictions for the upcoming football matches! We've analyz
 4. [Data Acquisition](#data-acquisition)
 5. [Data Preprocessing](#data-preprocessing)
 6. [Model Training](#model-training)
+   - [Training Corner Prediction Models](#training-corner-prediction-models)
 7. [Upcoming Matches Acquisition](#upcoming-matches-acquisition)
-    - [Set up the API_KEY](#setu-up-the-api_key)
+    - [Setup the API_KEY](#setup-the-api_key)
 8. [Making Predictions](#making-predictions)
 9. [Supported Leagues](#supported-leagues)
 10. [Contributing](#contributing)
@@ -73,12 +74,12 @@ Check out the latest predictions for the upcoming football matches! We've analyz
 
 ## Project Overview
 
-AIFootballPredictions aims to create a predictive model to forecast whether a football match will exceed 2.5 goals. The project is divided into four main stages:
+AIFootballPredictions aims to create a predictive model to forecast whether a football match will exceed 2.5 goals and predict corner outcomes (Over/Under 10.5 corners). The project is divided into four main stages:
 
 1. **Data Acquisition**: Download and merge historical football match data from multiple European leagues.
-2. **Data Preprocessing**: Process the raw data to engineer features, handle missing values, and select the most relevant features.
-3. **Model Training**: Train several machine learning models, perform hyperparameter tuning, and combine the best models into a voting classifier to make predictions.
-4. **Making Predictions**: Use the trained models to predict outcomes for upcoming matches and generate a formatted message for sharing.
+2. **Data Preprocessing**: Process the raw data to engineer features (including corner statistics), handle missing values, and select the most relevant features.
+3. **Model Training**: Train several machine learning models for both goals and corners predictions, perform hyperparameter tuning, and combine the best models into voting classifiers.
+4. **Making Predictions**: Use the trained models to predict outcomes for upcoming matches (goals and/or corners) and generate a formatted message for sharing.
 
 ## Directory Structure
 
@@ -104,12 +105,13 @@ The project is organized into the following directories:
 ### Key Scripts
 
 - **`data_acquisition.py`**: Downloads and merges football match data from specified leagues and seasons.
-- **`data_preprocessing.py`**: Preprocesses the raw data, performs feature engineering, and selects the most relevant features.
-- **`train_models.py`**: Trains machine learning models, performs hyperparameter tuning, and saves the best models.
+- **`data_preprocessing.py`**: Preprocesses the raw data, performs feature engineering (including corner feature extraction), and selects the most relevant features for both goals and corners predictions.
+- **`train_models.py`**: Trains machine learning models for goal predictions (Over/Under 2.5), performs hyperparameter tuning, and saves the best models with feature lists.
+- **`train_corner_models.py`**: Trains machine learning models for corner predictions (Over/Under 10.5), performs hyperparameter tuning, and saves the best models with feature lists.
 - **`acquire_next_matches.py`**: Acquires the next football matches data, updates team names using a mapping file, and saves the results to a JSON file.
-- **`make_predictions.py`**: Uses the trained models to predict outcomes for upcoming matches and formats the results into a readable txt message.
+- **`make_predictions_enhanced.py`**: Uses the trained models to predict outcomes for upcoming matches and formats the results into a readable txt message (supports both goals and corners predictions).
 
-**Note**: it is suggested to avoid path error, to execute all the scripts in the root folder. 
+**Note**: It is suggested to avoid path errors by executing all scripts from the root folder. 
 
 ## Setup and Installation
 
@@ -147,16 +149,25 @@ Once the raw data is downloaded, preprocess it by running the `data_preprocessin
 ```bash
 python scripts/data_preprocessing.py --raw_data_input_dir data/raw --processed_data_output_dir data/processed --num_features 20 --clustering_threshold 0.5
 ```
-This script processes each CSV file in the input folder, performs feature engineering, selects relevant features while addressing feature correlation, handles missing values, and saves the processed data.
+This script processes each CSV file in the input folder, performs feature engineering (creating corner statistics features), selects relevant features while addressing feature correlation, handles missing values, and saves the processed data with both goal and corner prediction targets.
 
 ## Model Training
 
-To train machine learning models and create a voting classifier, use the `train_models.py` script:
+To train machine learning models for goal predictions (Over/Under 2.5 Goals), use the `train_models.py` script:
 
 ```bash
 python scripts/train_models.py --processed_data_input_dir data/processed --trained_models_output_dir models --metric_choice accuracy --n_splits 10 --voting soft
 ```
-This script processes each CSV file individually, trains several machine learning models, performs hyperparameter tuning, combines the best models into a voting classifier, and saves the trained voting classifier for each league.
+This script processes each CSV file individually, trains several machine learning models, performs hyperparameter tuning, combines the best models into a voting classifier, saves the trained models, and exports the selected feature lists as JSON files for reproducible predictions.
+
+### Training Corner Prediction Models
+
+To train models for predicting corners (Over/Under 10.5), use the `train_corner_models.py` script:
+
+```bash
+python scripts/train_corner_models.py --processed_data_input_dir data/processed --trained_models_output_dir models --metric_choice accuracy --n_splits 10 --voting soft
+```
+This creates additional models (`*_corner_voting_classifier.pkl`) that predict whether a match will have over or under 10.5 total corners, with corner-specific feature selections saved as JSON files.
 
 ## Upcoming Matches Acquisition
 
@@ -173,7 +184,7 @@ This script will:
     - This step is necessary because the teams' names acquired with the [football-data.org API](https://www.football-data.org/) differ from the teams' names acquired from [football-data.co.uk](https://www.football-data.co.uk/), which've been used to train the ML models. 
 - Save the updated next matches to a JSON file.
 
-### Setu up the API_KEY 
+### Setup the API_KEY 
 
 In order to properly execute the `acquire_next_matches.py` script it is first necessary to set up the API_KEY to gather the next matches information. Below the procedure on how to properly set up the variable:
 
@@ -202,16 +213,29 @@ In order to properly execute the `acquire_next_matches.py` script it is first ne
 
 ## Making Predictions
 
-To predict the outcomes for upcoming matches and generate a formatted message for sharing, run the `make_predictions.py` script:
+To predict the outcomes for upcoming matches and generate a formatted message, run the `make_predictions_enhanced.py` script:
 
+**For goals predictions only:**
 ```bash
-python scripts/make_predictions.py --models_dir models --data_dir data/processed --output_file final_predictions.txt --json_competitions data/next_matches.json
+python scripts/make_predictions_enhanced.py --input_leagues_models_dir models --input_data_predict_dir data/processed --final_predictions_out_file final_predictions.txt --next_matches data/next_matches.json
 ```
-This script will:
 
-- Load the pre-trained models and the processed data.
+**For both goals and corners predictions:**
+```bash
+python scripts/make_predictions_enhanced.py --input_leagues_models_dir models --input_data_predict_dir data/processed --final_predictions_out_file final_predictions_with_corners.txt --next_matches data/next_matches.json --predict_corners
+```
+
+This script will:
+- Load the pre-trained voting classifier models for each league.
+- Load the saved feature lists (JSON files) to ensure feature alignment between training and prediction.
 - Make predictions for upcoming matches based on the next matches data.
-- Format the predictions into a redable `.txt` message and save it to the specified output file.
+- Format the predictions into a readable `.txt` message with prediction confidence scores.
+- If `--predict_corners` flag is used, include corner predictions (Over/Under 10.5 Corners) alongside goal predictions.
+
+**Output Format Example:**
+```
+- ⚽ **Man United** 🆚 **West Ham**: Under 2.5 Goals (89.69% chance) | Over 10.5 Corners: 72.97%
+```
 
 ## Supported Leagues
 

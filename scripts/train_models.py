@@ -29,6 +29,8 @@ import argparse
 import pickle
 import numpy as np
 import pandas as pd
+import logging
+import json
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -45,6 +47,9 @@ from skopt.space import Real, Integer, Categorical
 
 # Suppress the ConvergenceWarning
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 
 def parse_arguments():
@@ -107,12 +112,17 @@ def prepare_data(df: pd.DataFrame) -> tuple:
         The target variable.
     """
     y = df['Over2.5'].values
-    numerical_columns = df.select_dtypes(include=['number']).columns
-    X = df[numerical_columns].drop(columns=['Over2.5']).values
-    return X, y
+    numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
+    # Ensure targets are not part of features
+    if 'Over2.5' in numerical_columns:
+        numerical_columns.remove('Over2.5')
+    if 'OverUnder10.5Corners' in numerical_columns:
+        numerical_columns.remove('OverUnder10.5Corners')
+    X = df[numerical_columns].values
+    return X, y, numerical_columns
 
 
-def train_and_save_models(X: np.ndarray, y: np.ndarray, trained_models_output_dir: str, league_name: str, metric_choice: str, voting: str = 'soft', n_splits: int = 10):
+def train_and_save_models(X: np.ndarray, y: np.ndarray, feature_names: list, trained_models_output_dir: str, league_name: str, metric_choice: str, voting: str = 'soft', n_splits: int = 10):
     """
     Train models, perform hyperparameter tuning, create a voting classifier, and save the model.
 
@@ -210,7 +220,7 @@ def train_and_save_models(X: np.ndarray, y: np.ndarray, trained_models_output_di
     best_params = {}
 
     for model_name, (model, param_grid) in models.items():
-        print(f"Evaluating {model_name}...")
+        logging.info(f"Evaluating {model_name}...")
 
         # Initialize HalvingGridSearchCV with the inner cross-validation and hyperparameter grid
         grid_search = HalvingGridSearchCV(estimator=model, param_grid=param_grid, cv=cv, scoring=scorer, verbose=0)
@@ -225,8 +235,8 @@ def train_and_save_models(X: np.ndarray, y: np.ndarray, trained_models_output_di
         results[model_name] = cv_score
         best_params[model_name] = grid_search.best_params_
 
-        print(f"{model_name} - {scorer._score_func.__name__}: {np.mean(cv_score):.4f} ± {np.std(cv_score):.4f}")
-        print(f"Best parameters for {model_name}: {grid_search.best_params_}")
+        logging.info(f"{model_name} - {scorer._score_func.__name__}: {np.mean(cv_score):.4f} ± {np.std(cv_score):.4f}")
+        logging.info(f"Best parameters for {model_name}: {grid_search.best_params_}")
 
     # Initialize the models with the best hyperparameters
     best_lr_model = LogisticRegression(**best_params['Logistic Regression'])
@@ -236,7 +246,7 @@ def train_and_save_models(X: np.ndarray, y: np.ndarray, trained_models_output_di
     best_xgb_model = XGBClassifier(**best_params['XGBoost'])
     best_hgb_model = HistGradientBoostingClassifier(**best_params['HistGradientBoosting'])
 
-    print("Training Voting Classifier, an ensamble of the best models...")
+    logging.info("Training Voting Classifier, an ensamble of the best models...")
 
     # Combine the models into a voting classifier
     voting_clf = VotingClassifier(estimators=[
@@ -253,13 +263,37 @@ def train_and_save_models(X: np.ndarray, y: np.ndarray, trained_models_output_di
 
     # Evaluate the ensemble using cross-validation
     cv_scores = cross_val_score(voting_clf, X, y, cv=cv, scoring=scorer)
-    print(f"Voting Classifier - {scorer._score_func.__name__}: {np.mean(cv_scores):.4f} ± {np.std(cv_scores):.4f}")
+    logging.info(f"Voting Classifier - {scorer._score_func.__name__}: {np.mean(cv_scores):.4f} ± {np.std(cv_scores):.4f}")
 
     # Save the model
     model_filename = os.path.join(trained_models_output_dir, f"{league_name}_voting_classifier.pkl")
     with open(model_filename, 'wb') as f:
         pickle.dump(voting_clf, f)
-    print(f"Model saved to {model_filename}")
+    logging.info(f"Model saved to {model_filename}")
+
+    # Save the feature list used for this model (order matters)
+    try:
+        features_path = os.path.join(trained_models_output_dir, f"{league_name}_features.json")
+        with open(features_path, 'w', encoding='utf-8') as hf:
+            json.dump(feature_names, hf, ensure_ascii=False, indent=2)
+        logging.info(f"Feature list saved to {features_path}")
+    except Exception as e:
+        logging.warning(f"Could not save feature list for {league_name}: {e}")
+
+    # Write completion sentinel
+    try:
+        from datetime import datetime
+        sentinel = os.path.join(trained_models_output_dir, f"{league_name}_training_complete.txt")
+        with open(sentinel, 'w') as s:
+            s.write(f"league={league_name}\n")
+            s.write(f"model={os.path.basename(model_filename)}\n")
+            s.write(f"metric={scorer._score_func.__name__}\n")
+            s.write(f"mean_cv_score={np.mean(cv_scores):.6f}\n")
+            s.write(f"std_cv_score={np.std(cv_scores):.6f}\n")
+            s.write(f"completed_at={datetime.now().isoformat()}\n")
+        logging.info(f"Sentinel written: {sentinel}")
+    except Exception as e:
+        logging.warning(f"Could not write sentinel file: {e}")
 
 
 def main():
@@ -277,8 +311,8 @@ def main():
         # Train and save models for each league
         for league_name, df in data.items():
             print(f"Processing league: {league_name}")
-            X, y = prepare_data(df)
-            train_and_save_models(X, y, args.trained_models_output_dir, league_name, args.metric_choice, args.voting, args.n_splits)
+            X, y, feature_names = prepare_data(df)
+            train_and_save_models(X, y, feature_names, args.trained_models_output_dir, league_name, args.metric_choice, args.voting, args.n_splits)
         
     except Exception as e:
         raise (f"An error occurred: {e}")

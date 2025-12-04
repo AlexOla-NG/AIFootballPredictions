@@ -28,7 +28,7 @@ import pandas as pd
 VALID_LEAGUES = ["E0", "E1", "E2", "E3", "EC", "I1", "I2", "D1", "D2", "SP1", "SP2", "F1", "F2"]
 
 # Valid season codes (limiting to recent years only)
-VALID_SEASONS = ["2425","2324", "2223", "2122", "2021"]
+VALID_SEASONS = ["2526", "2425","2324", "2223", "2122", "2021"]
 
 def validate_leagues(leagues):
     """

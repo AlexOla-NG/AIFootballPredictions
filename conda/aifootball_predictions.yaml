@@ -10,8 +10,8 @@ dependencies:
   - python=3.10
   - pip
   - ipykernel
-  - cudatoolkit=11.2
-  - cudnn=8.1.0
+  # - cudatoolkit=11.2 # cudatoolkit version not compatible with apple m1 chips
+  # - cudnn=8.1.0 # commented out for apple m1 chips compatibility issues
   - pip:
     - pandas
     - requests
@@ -19,7 +19,7 @@ dependencies:
     - mrmr_selection
     - seaborn
     - xgboost
-    - tensorflow==2.10
+    - tensorflow==2.13
     - scikit-optimize
     - python-dotenv
     - invoke
