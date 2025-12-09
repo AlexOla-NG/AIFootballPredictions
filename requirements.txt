@@ -1,8 +1,16 @@
 pandas
 numpy==1.23.5
+scikit-learn==1.6.1
 mrmr_selection
 seaborn
+matplotlib
 xgboost
-tensorflow==2.10
+lightgbm
+catboost
 scikit-optimize
+scikit-learn-extra
+imbalanced-learn
+requests
+python-dotenv
+scipy
 

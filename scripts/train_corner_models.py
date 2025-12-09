@@ -35,7 +35,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier, VotingClassifier
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import cross_validate
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -62,7 +62,7 @@ def load_preprocessed_data(filepath: str) -> pd.DataFrame:
     return pd.read_csv(filepath)
 
 def prepare_data(df: pd.DataFrame, target_column: str):
-    """Prepare data for model training."""
+    """Prepare data for model training with feature scaling."""
     # Drop rows with missing target
     df = df.dropna(subset=[target_column])
     
@@ -76,7 +76,11 @@ def prepare_data(df: pd.DataFrame, target_column: str):
     X = df[numeric_cols].fillna(df[numeric_cols].mean())
     y = df[target_column].astype(int)
     
-    return X, y, numeric_cols
+    # Scale the features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    
+    return X_scaled, y, numeric_cols, scaler
 
 def train_model(model, X_train, y_train):
     """Train a single model."""
@@ -120,7 +124,7 @@ def train_corner_models(processed_data_dir: str, output_dir: str, metric_choice:
         
         print(f"Preparing data for {league}...")
         try:
-            X, y, numeric_cols = prepare_data(df, 'OverUnder10.5Corners')
+            X, y, numeric_cols, scaler = prepare_data(df, 'OverUnder10.5Corners')
         except Exception as e:
             print(f"Error preparing data for {league}: {e}")
             continue

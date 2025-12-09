@@ -38,6 +38,7 @@ from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import HalvingGridSearchCV, cross_val_score, KFold
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, f1_score, roc_auc_score
+from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 from sklearn.ensemble import HistGradientBoostingClassifier
 import warnings
@@ -98,6 +99,7 @@ def load_data(processed_data_input_dir: str) -> dict:
 def prepare_data(df: pd.DataFrame) -> tuple:
     """
     Prepare the feature matrix X and the target variable y from the DataFrame.
+    Features are scaled using StandardScaler for better model performance.
 
     Parameters:
     -----------
@@ -107,9 +109,11 @@ def prepare_data(df: pd.DataFrame) -> tuple:
     Returns:
     --------
     X : np.ndarray
-        The feature matrix.
+        The scaled feature matrix.
     y : np.ndarray
         The target variable.
+    scaler : StandardScaler
+        The fitted scaler object (can be used for transforming future data).
     """
     y = df['Over2.5'].values
     numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
@@ -119,7 +123,12 @@ def prepare_data(df: pd.DataFrame) -> tuple:
     if 'OverUnder10.5Corners' in numerical_columns:
         numerical_columns.remove('OverUnder10.5Corners')
     X = df[numerical_columns].values
-    return X, y, numerical_columns
+    
+    # Scale the features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    
+    return X_scaled, y, numerical_columns, scaler
 
 
 def train_and_save_models(X: np.ndarray, y: np.ndarray, feature_names: list, trained_models_output_dir: str, league_name: str, metric_choice: str, voting: str = 'soft', n_splits: int = 10):
@@ -311,7 +320,7 @@ def main():
         # Train and save models for each league
         for league_name, df in data.items():
             print(f"Processing league: {league_name}")
-            X, y, feature_names = prepare_data(df)
+            X, y, feature_names, scaler = prepare_data(df)
             train_and_save_models(X, y, feature_names, args.trained_models_output_dir, league_name, args.metric_choice, args.voting, args.n_splits)
         
     except Exception as e:
