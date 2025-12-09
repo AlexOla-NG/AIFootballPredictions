@@ -60,17 +60,21 @@ Check out the latest predictions for the upcoming football matches! We've analyz
 1. [Project Overview](#project-overview)
 2. [Directory Structure](#directory-structure)
 3. [Setup and Installation](#setup-and-installation)
-4. [Data Acquisition](#data-acquisition)
-5. [Data Preprocessing](#data-preprocessing)
-6. [Model Training](#model-training)
-   - [Training Corner Prediction Models](#training-corner-prediction-models)
-7. [Upcoming Matches Acquisition](#upcoming-matches-acquisition)
-    - [Setup the API_KEY](#setup-the-api_key)
-8. [Making Predictions](#making-predictions)
-9. [Supported Leagues](#supported-leagues)
-10. [Contributing](#contributing)
-11. [License](#license)
-12. [Disclaimer](#disclaimer)
+4. [Quick Start: Run Full Pipeline](#quick-start-run-full-pipeline)
+5. [Individual Steps](#individual-steps)
+   - [Data Acquisition](#data-acquisition)
+   - [Data Preprocessing](#data-preprocessing)
+   - [Model Training](#model-training)
+   - [Upcoming Matches Acquisition](#upcoming-matches-acquisition)
+   - [Making Predictions](#making-predictions)
+6. [Model Evaluation & Performance Tracking](#model-evaluation--performance-tracking)
+   - [Evaluate Models](#evaluate-models)
+   - [Backtest Predictions](#backtest-predictions)
+   - [Track Metrics Over Time](#track-metrics-over-time)
+7. [Supported Leagues](#supported-leagues)
+8. [Contributing](#contributing)
+9. [License](#license)
+10. [Disclaimer](#disclaimer)
 
 ## Project Overview
 
@@ -131,6 +135,40 @@ To set up the environment for this project, follow these steps:
    conda activate aifootball_predictions
    ```
 
+3. Install Python dependencies
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+   Alternatively, the `run_full_pipeline.sh` script will automatically install all dependencies before running the pipeline.
+
+## Quick Start: Run Full Pipeline
+
+To execute the entire pipeline (data acquisition → preprocessing → model training → predictions) in one command, use the provided shell script:
+
+```bash
+./run_full_pipeline.sh
+```
+
+This script will automatically:
+1. Download historical match data for all leagues
+2. Preprocess data and engineer features (including corners)
+3. Train goal prediction models (Over/Under 2.5 Goals)
+4. Train corner prediction models (Over/Under 10.5 Corners)
+5. Acquire next matches data
+6. Generate combined predictions with goals and corners forecasts
+
+The script includes error handling and color-coded progress output. Results are saved to `final_predictions_with_corners.txt`.
+
+**Note**: Make sure your conda environment is activated and the API_KEY is set in `~/.env` before running the script.
+
+---
+
+## Individual Steps
+
+If you prefer to run each step separately, follow the instructions below:
+
 ## Data Acquisition
 
 To download and merge football match data, run the `data_acquisition.py` script:
@@ -158,7 +196,13 @@ To train machine learning models for goal predictions (Over/Under 2.5 Goals), us
 ```bash
 python scripts/train_models.py --processed_data_input_dir data/processed --trained_models_output_dir models --metric_choice accuracy --n_splits 10 --voting soft
 ```
-This script processes each CSV file individually, trains several machine learning models, performs hyperparameter tuning, combines the best models into a voting classifier, saves the trained models, and exports the selected feature lists as JSON files for reproducible predictions.
+This script:
+- Processes each CSV file individually
+- Scales features using StandardScaler for optimal model performance
+- Trains several machine learning models (Logistic Regression, Random Forest, SVM, XGBoost, etc.)
+- Performs hyperparameter tuning using Bayesian optimization
+- Combines the best models into a voting classifier
+- Saves the trained models and exports feature lists as JSON files for reproducible predictions
 
 ### Training Corner Prediction Models
 
@@ -236,6 +280,71 @@ This script will:
 ```
 - ⚽ **Man United** 🆚 **West Ham**: Under 2.5 Goals (89.69% chance) | Over 10.5 Corners: 72.97%
 ```
+
+## Model Evaluation & Performance Tracking
+
+After making predictions, evaluate and track your model's performance with detailed metrics and visualizations.
+
+### Evaluate Models
+
+Analyze model performance with comprehensive metrics (Accuracy, Precision, Recall, F1, ROC-AUC):
+
+```bash
+python scripts/evaluate_models.py --processed_data_input_dir data/processed --trained_models_output_dir models
+```
+
+This script generates:
+- **Detailed metrics** for each league and target (goals/corners)
+- **Cross-validation results** showing test and training scores
+- **Comparison report** (`model_comparison.csv`) with all leagues side-by-side
+- **Visualizations** showing performance across leagues
+
+Output files:
+- `metrics/` directory with individual league metrics (JSON)
+- `model_comparison.csv` - Summary table of all metrics
+- `goals_metrics_comparison.png` - Goals model performance visualization
+- `corners_metrics_comparison.png` - Corner model performance visualization
+
+### Backtest Predictions
+
+Test your models against historical data to assess real-world performance:
+
+```bash
+python scripts/backtest_predictions.py --processed_data_input_dir data/processed --trained_models_output_dir models
+```
+
+This script performs time-series backtesting and evaluates:
+- **Overall accuracy** on held-out test folds
+- **Precision and Recall** for "Over" and "Under" predictions separately
+- **Per-league performance** to identify which leagues perform best
+- **Fold-by-fold results** to understand variance
+
+Output files:
+- `backtest_results/` directory with detailed backtest results (JSON)
+- `backtest_comparison.csv` - Summary of all backtest results
+- `goals_backtest_results.png` - Goals prediction backtest visualization
+- `corners_backtest_results.png` - Corner prediction backtest visualization
+
+### Track Metrics Over Time
+
+Monitor model improvements across training runs:
+
+```bash
+python scripts/track_metrics.py --metrics_dir metrics --backtest_dir backtest_results
+```
+
+This script:
+- **Maintains a history** of all evaluation and backtest runs
+- **Creates trend analysis** to identify improving/degrading metrics
+- **Generates CSV reports** for easy comparison over time
+- **Tracks separate snapshots** for each model iteration
+
+Output files:
+- `metrics_history.json` - Complete historical record
+- `metrics_history.csv` - Evaluation metrics timeline
+- `backtest_history.csv` - Backtest results timeline
+
+**Quick Tip**: These evaluation scripts run automatically as part of the full pipeline (steps 7-9). You can also run them individually to analyze existing models without retraining.
 
 ## Supported Leagues
 
