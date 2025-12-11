@@ -1,0 +1,60 @@
+{
+  "league": "F1",
+  "target": "OverUnder10.5Corners",
+  "timestamp": "2025-12-11T20:51:30.280810",
+  "total_backtests": 5,
+  "total_predictions": 930,
+  "overall_accuracy": 0.9505376344086022,
+  "accuracy_std": 0.009855001494528679,
+  "average_precision_under": 0.9430531986820787,
+  "average_precision_over": 0.9691318118445779,
+  "average_recall_under": 0.9853308917596889,
+  "average_recall_over": 0.8801654401385257,
+  "fold_results": [
+    {
+      "fold": 1,
+      "accuracy": 0.9516129032258065,
+      "precision_under": 0.9393939393939394,
+      "precision_over": 0.9814814814814815,
+      "recall_under": 0.992,
+      "recall_over": 0.8688524590163934,
+      "test_size": 186
+    },
+    {
+      "fold": 2,
+      "accuracy": 0.9408602150537635,
+      "precision_under": 0.9426229508196722,
+      "precision_over": 0.9375,
+      "recall_under": 0.9663865546218487,
+      "recall_over": 0.8955223880597015,
+      "test_size": 186
+    },
+    {
+      "fold": 3,
+      "accuracy": 0.9408602150537635,
+      "precision_under": 0.9166666666666666,
+      "precision_over": 1.0,
+      "recall_under": 1.0,
+      "recall_over": 0.8307692307692308,
+      "test_size": 186
+    },
+    {
+      "fold": 4,
+      "accuracy": 0.967741935483871,
+      "precision_under": 0.9669421487603306,
+      "precision_over": 0.9692307692307692,
+      "recall_under": 0.9831932773109243,
+      "recall_over": 0.9402985074626866,
+      "test_size": 186
+    },
+    {
+      "fold": 5,
+      "accuracy": 0.9516129032258065,
+      "precision_under": 0.9496402877697842,
+      "precision_over": 0.9574468085106383,
+      "recall_under": 0.9850746268656716,
+      "recall_over": 0.8653846153846154,
+      "test_size": 186
+    }
+  ]
+}
