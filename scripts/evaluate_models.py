@@ -264,7 +264,7 @@ def main():
     print("="*60)
     
     for league_name, df in data.items():
-        model_path = os.path.join(args.trained_models_output_dir, f"{league_name}_voting_classifier.pkl")
+        model_path = os.path.join(args.trained_models_output_dir, f"{league_name}_over2.5_voting_classifier.pkl")
         
         if not os.path.exists(model_path):
             print(f"⚠ Model not found for {league_name}")

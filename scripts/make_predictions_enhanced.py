@@ -15,7 +15,7 @@ import numpy as np
 from datetime import datetime
 import argparse
 
-VALID_LEAGUES = ["E0", "I1", "D1", "SP1", "F1"]
+VALID_LEAGUES = ["E0", "I1", "D1", "SP1", "F1", "E1", "N1"]
 
 HOME_TEAM_FEATURES = [
     'HomeTeam', 'FTHG', 'HG', 'HTHG', 'HS', 'HST', 'HHW', 'HC', 'HF', 'HFKC', 'HO', 'HY', 'HR', 'HBP',
@@ -171,7 +171,7 @@ def main(input_leagues_models_dir: str, input_data_predict_dir: str, final_predi
         print(f"----------------------------------")
         print(f"\nMaking predictions for {league}...\n")
         
-        goals_model_path = os.path.join(input_leagues_models_dir, f"{league}_voting_classifier.pkl")
+        goals_model_path = os.path.join(input_leagues_models_dir, f"{league}_over2.5_voting_classifier.pkl")
         corners_model_path = os.path.join(input_leagues_models_dir, f"{league}_corner_voting_classifier.pkl")
         data_path = os.path.join(input_data_predict_dir, f"{league}_merged_preprocessed.csv")
 

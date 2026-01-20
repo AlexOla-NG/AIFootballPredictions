@@ -55,11 +55,33 @@ def parse_arguments():
     parser.add_argument("--voting", type=str, default="soft", choices=["hard", "soft"], help="Type of voting.")
     return parser.parse_args()
 
-def load_preprocessed_data(filepath: str) -> pd.DataFrame:
-    """Load preprocessed CSV file."""
-    if not os.path.exists(filepath):
-        raise FileNotFoundError(f"File not found: {filepath}")
-    return pd.read_csv(filepath)
+def load_data(processed_data_input_dir: str) -> dict:
+    """
+    Load CSV files from the specified folder and return a dictionary of DataFrames.
+
+    Parameters:
+    -----------
+    processed_data_input_dir : str
+        The path to the folder containing the CSV files.
+
+    Returns:
+    --------
+    data : dict
+        A dictionary where keys are file names (without extension) and values are DataFrames.
+    """
+    data = {}
+    for file_name in os.listdir(processed_data_input_dir):
+        if file_name.endswith('.csv'):
+            league_name = file_name.split('_')[0]
+            file_path = os.path.join(processed_data_input_dir, file_name)
+            data[league_name] = pd.read_csv(file_path)
+    return data
+
+# def load_preprocessed_data(filepath: str) -> pd.DataFrame:
+#     """Load preprocessed CSV file."""
+#     if not os.path.exists(filepath):
+#         raise FileNotFoundError(f"File not found: {filepath}")
+#     return pd.read_csv(filepath)
 
 def prepare_data(df: pd.DataFrame, target_column: str):
     """Prepare data for model training with feature scaling."""
@@ -82,10 +104,10 @@ def prepare_data(df: pd.DataFrame, target_column: str):
     
     return X_scaled, y, numeric_cols, scaler
 
-def train_model(model, X_train, y_train):
-    """Train a single model."""
-    model.fit(X_train, y_train)
-    return model
+# def train_model(model, X_train, y_train):
+#     """Train a single model."""
+#     model.fit(X_train, y_train)
+#     return model
 
 def evaluate_model(model, X, y, metric_choice, n_splits):
     """Evaluate model using cross-validation."""
@@ -94,6 +116,116 @@ def evaluate_model(model, X, y, metric_choice, n_splits):
     mean_score = cv_results['test_score'].mean()
     std_score = cv_results['test_score'].std()
     return mean_score, std_score
+
+# def train_corner_models(processed_data_dir: str, output_dir: str, metric_choice: str, n_splits: int, voting_type: str):
+#     """Main training function for corner prediction models."""
+#     if not os.path.exists(output_dir):
+#         os.makedirs(output_dir)
+    
+#     # Valid leagues
+#     valid_leagues = ["E0", "I1", "D1", "SP1", "F1"]
+    
+#     for league in valid_leagues:
+#         print(f"\nProcessing league: {league}")
+#         data_file = os.path.join(processed_data_dir, f"{league}_merged_preprocessed.csv")
+        
+#         if not os.path.exists(data_file):
+#             print(f"Data file not found for {league}. Skipping...")
+#             continue
+        
+#         try:
+#             df = load_preprocessed_data(data_file)
+#         except Exception as e:
+#             print(f"Error loading data for {league}: {e}")
+#             continue
+        
+#         # Check if corner target exists
+#         if 'OverUnder10.5Corners' not in df.columns:
+#             print(f"Corner target 'OverUnder10.5Corners' not found for {league}. Skipping...")
+#             continue
+        
+#         print(f"Preparing data for {league}...")
+#         try:
+#             X, y, numeric_cols, scaler = prepare_data(df, 'OverUnder10.5Corners')
+#         except Exception as e:
+#             print(f"Error preparing data for {league}: {e}")
+#             continue
+        
+#         if len(X) < 50:
+#             print(f"Insufficient data for {league} ({len(X)} samples). Skipping...")
+#             continue
+        
+#         print(f"Data prepared: {X.shape[0]} samples, {X.shape[1]} features")
+        
+#         # Initialize models
+#         models = {
+#             'LogisticRegression': LogisticRegression(max_iter=3000, random_state=42),
+#             'KNN': KNeighborsClassifier(),
+#             'SVM': SVC(probability=True, random_state=42),
+#             'DecisionTree': DecisionTreeClassifier(random_state=42),
+#             'RandomForest': RandomForestClassifier(n_estimators=100, random_state=42),
+#             'XGBoost': XGBClassifier(random_state=42, verbosity=0),
+#             'LightGBM': LGBMClassifier(random_state=42, verbose=-1),
+#             'HistGradientBoosting': HistGradientBoostingClassifier(random_state=42)
+#         }
+        
+#         best_models = []
+        
+#         for model_name, model in models.items():
+#             logging.info(f"\nEvaluating {model_name}...")
+#             try:
+#                 mean_score, std_score = evaluate_model(model, X, y, metric_choice, n_splits)
+#                 logging.info(f"{model_name} - {metric_choice}: {mean_score:.4f} ± {std_score:.4f}")
+#                 best_models.append((model_name, model, mean_score))
+#             except Exception as e:
+#                 logging.warning(f"Error evaluating {model_name}: {e}")
+#                 continue
+        
+#         # Select top 3 models for voting
+#         best_models = sorted(best_models, key=lambda x: x[2], reverse=True)[:3]
+        
+#         if len(best_models) < 2:
+#             print(f"Not enough models trained for {league}. Skipping...")
+#             continue
+        
+#         logging.info(f"\nTraining final models for voting ensemble...")
+#         voting_models = [(name, model) for name, model, _ in best_models]
+        
+#         # Train voting classifier
+#         voting_clf = VotingClassifier(estimators=voting_models, voting=voting_type)
+#         voting_clf.fit(X, y)
+#         mean_score, std_score = evaluate_model(voting_clf, X, y, metric_choice, n_splits)
+#         logging.info(f"Voting Classifier ({voting_type}) - {metric_choice}: {mean_score:.4f} ± {std_score:.4f}")
+        
+#         # Save corner model
+#         model_path = os.path.join(output_dir, f"{league}_corner_voting_classifier.pkl")
+#         with open(model_path, 'wb') as f:
+#             pickle.dump(voting_clf, f)
+#         logging.info(f"Corner model saved to {model_path}")
+
+#         # Save feature list used
+#         try:
+#             features_path = os.path.join(output_dir, f"{league}_corner_features.json")
+#             with open(features_path, 'w', encoding='utf-8') as hf:
+#                 json.dump(numeric_cols, hf, ensure_ascii=False, indent=2)
+#             logging.info(f"Corner feature list saved to {features_path}")
+#         except Exception as e:
+#             logging.warning(f"Could not save corner feature list for {league}: {e}")
+
+#         # Write sentinel file for completion
+#         try:
+#             from datetime import datetime
+#             sentinel = os.path.join(output_dir, f"{league}_corner_training_complete.txt")
+#             with open(sentinel, 'w') as s:
+#                 s.write(f"league={league}\n")
+#                 s.write(f"model={os.path.basename(model_path)}\n")
+#                 s.write(f"metric={metric_choice}\n")
+#                 s.write(f"mean_cv_score={mean_score:.6f}\n")
+#                 s.write(f"std_cv_score={std_score:.6f}\n")
+#                 s.write(f"completed_at={datetime.now().isoformat()}\n")
+#             logging.info(f"Sentinel written: {sentinel}")
+#         except Exception as e:
+#             logging.warning(f"Could not write sentinel file: {e}")
 
 def train_corner_models(processed_data_dir: str, output_dir: str, metric_choice: str, n_splits: int, voting_type: str):
     """Main training function for corner prediction models."""
@@ -204,6 +336,27 @@ def train_corner_models(processed_data_dir: str, output_dir: str, metric_choice:
             logging.info(f"Sentinel written: {sentinel}")
         except Exception as e:
             logging.warning(f"Could not write sentinel file: {e}")
+
+def main():
+
+    try:
+        # Parse arguments
+        args = parse_arguments()
+
+        # Load data
+        data = load_data(args.processed_data_input_dir)
+
+        # Ensure output directory exists
+        os.makedirs(args.trained_models_output_dir, exist_ok=True)
+
+        # Train and save models for each league
+        for league_name, df in data.items():
+            print(f"Processing league: {league_name}")
+            X, y, feature_names, scaler = prepare_data(df)
+            train_and_save_models(X, y, feature_names, args.trained_models_output_dir, league_name, args.metric_choice, args.voting, args.n_splits, scaler=scaler)
+        
+    except Exception as e:
+        raise (f"An error occurred: {e}")
 
 if __name__ == "__main__":
     args = parse_arguments()

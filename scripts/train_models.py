@@ -62,7 +62,7 @@ def parse_arguments():
     args : argparse.Namespace
         Parsed command-line arguments.
     """
-    parser = argparse.ArgumentParser(description="Train models to predict Over2.5 football outcomes.")
+    parser = argparse.ArgumentParser(description="Train models to predict football outcomes.")
     parser.add_argument('--processed_data_input_dir', type=str, required=True, help="Path to the folder containing CSV files.")
     parser.add_argument('--trained_models_output_dir', type=str, required=True, help="Path to the folder to save trained models.")
     # Specify the allowed choices for metric_choice
@@ -70,6 +70,7 @@ def parse_arguments():
                         help="The metric to use for hyperparameter tuning. Choose from 'accuracy', 'precision', 'f1', or 'roc_auc'.")
     parser.add_argument('--n_splits', type=int, default=10, help="Number of splits for cross-validation.")
     parser.add_argument('--voting', type=str, choices=['soft', 'hard'], default='soft', help="Voting method for the ensemble model.")
+    parser.add_argument('--model_to_train', type=str, choices=['Over2.5', 'Corner'], default='Over2.5', help="Model to train ('Over2.5' or 'Corner').")
     return parser.parse_args()
 
 
@@ -96,7 +97,7 @@ def load_data(processed_data_input_dir: str) -> dict:
     return data
 
 
-def prepare_data(df: pd.DataFrame) -> tuple:
+def prepare_data(df: pd.DataFrame, model_to_train: str) -> tuple:
     """
     Prepare the feature matrix X and the target variable y from the DataFrame.
     Features are scaled using StandardScaler for better model performance.
@@ -105,6 +106,8 @@ def prepare_data(df: pd.DataFrame) -> tuple:
     -----------
     df : pd.DataFrame
         The DataFrame containing the preprocessed data.
+    model_to_train : str
+        The type of model to train ("Over2.5" or "Corner").
 
     Returns:
     --------
@@ -115,8 +118,13 @@ def prepare_data(df: pd.DataFrame) -> tuple:
     scaler : StandardScaler
         The fitted scaler object (can be used for transforming future data).
     """
-    y = df['Over2.5'].values
+    if model_to_train == "Corner":
+        y = df['OverUnder10.5Corners'].values
+    else:
+        y = df['Over2.5'].values
+    
     numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
+    
     # Ensure targets are not part of features
     if 'Over2.5' in numerical_columns:
         numerical_columns.remove('Over2.5')
@@ -131,7 +139,7 @@ def prepare_data(df: pd.DataFrame) -> tuple:
     return X_scaled, y, numerical_columns, scaler
 
 
-def train_and_save_models(X: np.ndarray, y: np.ndarray, feature_names: list, trained_models_output_dir: str, league_name: str, metric_choice: str, voting: str = 'soft', n_splits: int = 10):
+def train_and_save_models(X: np.ndarray, y: np.ndarray, feature_names: list, trained_models_output_dir: str, league_name: str, metric_choice: str, model_to_train: str, voting: str = 'soft', n_splits: int = 10, scaler=None):
     """
     Train models, perform hyperparameter tuning, create a voting classifier, and save the model.
 
@@ -147,10 +155,20 @@ def train_and_save_models(X: np.ndarray, y: np.ndarray, feature_names: list, tra
         The name of the league, used for naming the saved model file.
     metric_choice : str
         The metric to use for hyperparameter tuning.
+    model_to_train : str
+        The type of model to train ("Over2.5" or "Corner").
     n_splits : int
         Number of splits for cross-validation
     
     """
+
+    # Determine feature name suffix based on model type
+    feature_suffix = ""
+    if(model_to_train == "Over2.5"):
+        feature_suffix = "_over2.5"
+    else:
+        feature_suffix = "_corner"
+
     # Define models and hyperparameters
     lr_model = LogisticRegression(random_state=42)
     lr_param_grid = {
@@ -275,14 +293,24 @@ def train_and_save_models(X: np.ndarray, y: np.ndarray, feature_names: list, tra
     logging.info(f"Voting Classifier - {scorer._score_func.__name__}: {np.mean(cv_scores):.4f} ± {np.std(cv_scores):.4f}")
 
     # Save the model
-    model_filename = os.path.join(trained_models_output_dir, f"{league_name}_voting_classifier.pkl")
+    model_filename = os.path.join(trained_models_output_dir, f"{league_name}{feature_suffix}_voting_classifier.pkl")
     with open(model_filename, 'wb') as f:
         pickle.dump(voting_clf, f)
     logging.info(f"Model saved to {model_filename}")
 
+    # Save the scaler used for training
+    if scaler is not None:
+        try:
+            scaler_path = os.path.join(trained_models_output_dir, f"{league_name}_scaler.pkl")
+            with open(scaler_path, 'wb') as f:
+                pickle.dump(scaler, f)
+            logging.info(f"Scaler saved to {scaler_path}")
+        except Exception as e:
+            logging.warning(f"Could not save scaler for {league_name}: {e}")
+
     # Save the feature list used for this model (order matters)
     try:
-        features_path = os.path.join(trained_models_output_dir, f"{league_name}_features.json")
+        features_path = os.path.join(trained_models_output_dir, f"{league_name}{feature_suffix}_features.json")
         with open(features_path, 'w', encoding='utf-8') as hf:
             json.dump(feature_names, hf, ensure_ascii=False, indent=2)
         logging.info(f"Feature list saved to {features_path}")
@@ -292,7 +320,7 @@ def train_and_save_models(X: np.ndarray, y: np.ndarray, feature_names: list, tra
     # Write completion sentinel
     try:
         from datetime import datetime
-        sentinel = os.path.join(trained_models_output_dir, f"{league_name}_training_complete.txt")
+        sentinel = os.path.join(trained_models_output_dir, f"{league_name}{feature_suffix}_training_complete.txt")
         with open(sentinel, 'w') as s:
             s.write(f"league={league_name}\n")
             s.write(f"model={os.path.basename(model_filename)}\n")
@@ -320,8 +348,8 @@ def main():
         # Train and save models for each league
         for league_name, df in data.items():
             print(f"Processing league: {league_name}")
-            X, y, feature_names, scaler = prepare_data(df)
-            train_and_save_models(X, y, feature_names, args.trained_models_output_dir, league_name, args.metric_choice, args.voting, args.n_splits)
+            X, y, feature_names, scaler = prepare_data(df, args.model_to_train)
+            train_and_save_models(X, y, feature_names, args.trained_models_output_dir, league_name, args.metric_choice, args.model_to_train, args.voting, args.n_splits, scaler=scaler)
         
     except Exception as e:
         raise (f"An error occurred: {e}")

@@ -26,8 +26,11 @@ import os
 import json
 import argparse
 
-# Load environment variables from a .env file located in the home directory
+# Load environment variables: prioritize ~/.env then project .env (if present)
 load_dotenv(dotenv_path=os.path.expanduser("~/.env"))
+# Also try loading a .env in the project root (useful when running from the repo)
+load_dotenv()  # loads .env from current working directory if present
+
 
 # Parameters
 API_KEY = os.getenv("API_FOOTBALL_DATA")
@@ -71,7 +74,19 @@ COMPETITIONS = {
         'crest': 'https://crests.football-data.org/FL1.png', 
         'name': 'Ligue 1', 
         'next_matches': []
-    }
+    },
+    'E1': {
+        'id': 2016, 
+        'crest': 'https://crests.football-data.org/ELC.png', 
+        'name': 'English Championship', 
+        'next_matches': []
+    },
+    'N1': {
+        'id': 2003, 
+        'crest': 'https://crests.football-data.org/ED.png', 
+        'name': 'Eredivisie', 
+        'next_matches': []
+    },
 }
 
 
@@ -175,6 +190,49 @@ TEAMS_NAMES_MAPPING = {
     'Racing Club de Lens': 'Lens',
     'AC Ajaccio': 'Ajaccio',
     'FC Metz': 'Metz',
+     'Blackburn Rovers FC': 'Blackburn',
+    'Norwich City FC': 'Norwich',
+    'Queens Park Rangers FC': 'QPR',
+    'Stoke City FC': 'Stoke',
+    'Swansea City AFC': 'Swansea',
+    'West Bromwich Albion FC': 'West Brom',
+    'Hull City AFC': 'Hull City',
+    'Portsmouth FC': 'Portsmouth',
+    'Birmingham City FC': 'Birmingham',
+    'Leicester City FC': 'Leicester',
+    'Southampton FC': 'Southampton',
+    'Derby County FC': 'Derby',
+    'Middlesbrough FC': 'Middlesbrough',
+    'Millwall FC': 'Millwall',
+    'Bristol City FC': 'Bristol City',
+    'Ipswich Town FC': 'Ipswich',
+    'Sheffield Wednesday FC': 'Sheff Wed',
+    'Sheffield United FC': 'Sheffield Utd',
+    'Watford FC': 'Watford',
+    'Charlton Athletic FC': 'Charlton',
+    'Wrexham AFC': 'Wrexham',
+    'Coventry City FC': 'Coventry',
+    'Preston North End FC': 'Preston',
+    'Oxford United FC': 'Oxford United',
+    'Blackpool FC': 'Blackpool',
+    'Huddersfield Town AFC': 'Huddersfield',
+    'Rotherham United FC': 'Rotherham',
+    'AFC Ajax': 'Ajax',
+    'PSV Eindhoven': 'PSV',
+    'Feyenoord Rotterdam': 'Feyenoord',
+    'AZ Alkmaar': 'AZ',
+    'FC Utrecht': 'Utrecht',
+    'FC Twente': 'Twente',
+    'Vitesse Arnhem': 'Vitesse',
+    'Sparta Rotterdam': 'Sparta',
+    'SC Heerenveen': 'Heerenveen',
+    'Go Ahead Eagles': 'Go Ahead',
+    'PEC Zwolle': 'Zwolle',
+    'Fortuna Sittard': 'Fortuna',
+    'Excelsior Rotterdam': 'Excelsior',
+    'FC Groningen': 'Groningen',
+    'Heracles Almelo': 'Heracles',
+    'NEC Nijmegen': 'NEC'
 }
 
 def get_next_matches(headers: dict, base_url: str) -> dict:
@@ -195,7 +253,9 @@ def get_next_matches(headers: dict, base_url: str) -> dict:
     # Check if the API key is provided
     for var in env_vars_name:
         if os.getenv(var) is None:
-            raise ValueError(f"Environment variable {var} is not set. Please see the README for more information.")
+            raise ValueError(
+                f"Environment variable {var} is not set. Please set it in your shell or add it to ~/.env or a project .env file (see README)."
+            )
     
     try:
         for competition, competition_info in COMPETITIONS.items():

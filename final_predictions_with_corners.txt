@@ -1,30 +1,27 @@
 🎯 **AI Football Predictions: Goals & Corners** 🎯
 
 Check out the latest predictions for the upcoming football matches!
- PREDICTIONS DONE: 2025-12-11 
+ PREDICTIONS DONE: 2026-01-20 
 
 **Premier League**:
 
 **Serie A**:
 
 **Bundesliga**:
-- ⚽ **Union Berlin** 🆚 **RB Leipzig**: Over 2.5 Goals! 🔥 (95.92% chance) | Over 10.5 Corners: 54.95%
-- ⚽ **Ein Frankfurt** 🆚 **Augsburg**: Over 2.5 Goals! 🔥 (95.97% chance) | Under 10.5 Corners: 50.27%
-- ⚽ **M'gladbach** 🆚 **Wolfsburg**: Over 2.5 Goals! 🔥 (94.01% chance) | Over 10.5 Corners: 82.83%
-- ⚽ **St Pauli** 🆚 **Heidenheim**: Over 2.5 Goals! 🔥 (95.7% chance) | Over 10.5 Corners: 53.71%
-- ⚽ **Freiburg** 🆚 **Dortmund**: Over 2.5 Goals! 🔥 (96.02% chance) | Under 10.5 Corners: 50.17%
-- ⚽ **Bayern Munich** 🆚 **Mainz**: Over 2.5 Goals! 🔥 (96.04% chance) | Under 10.5 Corners: 50.35%
-- ⚽ **Werder Bremen** 🆚 **Stuttgart**: Over 2.5 Goals! 🔥 (95.98% chance) | Under 10.5 Corners: 50.39%
 
 **La Liga**:
 
 **Ligue 1**:
-- ⚽ **Angers** 🆚 **Nantes**: Over 2.5 Goals! 🔥 (93.26% chance) | Over 10.5 Corners: 80.28%
-- ⚽ **Rennes** 🆚 **Brest**: Over 2.5 Goals! 🔥 (92.72% chance) | Over 10.5 Corners: 80.29%
-- ⚽ **Metz** 🆚 **Paris SG**: Over 2.5 Goals! 🔥 (92.94% chance) | Over 10.5 Corners: 80.11%
-- ⚽ **Paris FC** 🆚 **Toulouse**: Over 2.5 Goals! 🔥 (92.83% chance) | Over 10.5 Corners: 80.29%
-- ⚽ **Lyon** 🆚 **Le Havre**: Over 2.5 Goals! 🔥 (92.95% chance) | Over 10.5 Corners: 80.24%
-- ⚽ **Auxerre** 🆚 **Lille**: Over 2.5 Goals! 🔥 (92.87% chance) | Over 10.5 Corners: 80.29%
-- ⚽ **Lens** 🆚 **Nice**: Over 2.5 Goals! 🔥 (92.92% chance) | Over 10.5 Corners: 80.28%
-- ⚽ **Marseille** 🆚 **Monaco**: Over 2.5 Goals! 🔥 (93.01% chance) | Over 10.5 Corners: 80.29%
+
+**English Championship**:
+- ⚽ **Coventry** 🆚 **Millwall**: Over 2.5 Goals! 🔥 (96.23% chance) | Over 10.5 Corners: 89.15%
+- ⚽ **Ipswich** 🆚 **Bristol City**: Over 2.5 Goals! 🔥 (96.27% chance) | Over 10.5 Corners: 85.74%
+- ⚽ **Swansea** 🆚 **Blackburn**: Over 2.5 Goals! 🔥 (96.41% chance) | Over 10.5 Corners: 85.29%
+- ⚽ **West Brom** 🆚 **Norwich**: Over 2.5 Goals! 🔥 (96.38% chance) | Over 10.5 Corners: 86.4%
+- ⚽ **Charlton** 🆚 **Derby**: Over 2.5 Goals! 🔥 (96.23% chance) | Over 10.5 Corners: 87.12%
+- ⚽ **Wrexham** 🆚 **Leicester**: Over 2.5 Goals! 🔥 (96.34% chance) | Over 10.5 Corners: 85.47%
+- ⚽ **Watford** 🆚 **Portsmouth**: Over 2.5 Goals! 🔥 (96.33% chance) | Over 10.5 Corners: 86.53%
+- ⚽ **Stoke** 🆚 **Middlesbrough**: Over 2.5 Goals! 🔥 (96.32% chance) | Over 10.5 Corners: 85.35%
+
+**Eredivisie**:
 

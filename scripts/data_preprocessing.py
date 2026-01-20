@@ -28,23 +28,24 @@ import argparse
 import pandas as pd
 import numpy as np
 import scipy.cluster.hierarchy as sch
-try:
-    from mrmr import mrmr_classif
-except Exception:
-    from sklearn.feature_selection import mutual_info_classif
-    def mrmr_classif(X=None, y=None, K=20):
-        """
-        Fallback mRMR-like selector using mutual information when the `mrmr` package
-        is not available. This picks the top-K features by mutual information with
-        the target. It accepts the same argument names used in the script.
-        """
-        if X is None or y is None:
-            return []
-        # Fill NaNs with zeros for MI calculation; MI requires finite numbers
-        X_filled = X.fillna(0)
-        mi = mutual_info_classif(X_filled, y)
-        idx = np.argsort(mi)[-K:][::-1]
-        return list(X.columns[idx])
+from mrmr import mrmr_classif
+# try:
+#     from mrmr import mrmr_classif
+# except Exception:
+#     from sklearn.feature_selection import mutual_info_classif
+#     def mrmr_classif(X=None, y=None, K=20):
+#         """
+#         Fallback mRMR-like selector using mutual information when the `mrmr` package
+#         is not available. This picks the top-K features by mutual information with
+#         the target. It accepts the same argument names used in the script.
+#         """
+#         if X is None or y is None:
+#             return []
+#         # Fill NaNs with zeros for MI calculation; MI requires finite numbers
+#         X_filled = X.fillna(0)
+#         mi = mutual_info_classif(X_filled, y)
+#         idx = np.argsort(mi)[-K:][::-1]
+#         return list(X.columns[idx])
 from sklearn.preprocessing import StandardScaler
 
 def parse_arguments():

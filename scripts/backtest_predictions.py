@@ -366,6 +366,7 @@ def main():
     print("="*70)
     
     for league_name, df in data.items():
+        print(f"Processing league: {league_name}")
         model_path = os.path.join(args.trained_models_output_dir, f"{league_name}_voting_classifier.pkl")
         
         if not os.path.exists(model_path):
@@ -375,17 +376,68 @@ def main():
         # Load model
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
-        
-        # Prepare data
-        X, y, _ = prepare_data(df, target='Over2.5')
-        
-        # Backtest
-        summary, y_true, y_pred, y_proba = backtest_model(model, X, y, league_name, target='Over2.5', n_splits=5)
-        all_results.append(summary)
-        print_backtest_results(summary)
-        
-        # Save results
-        save_backtest_results(summary, args.backtest_output_dir, league_name, 'goals')
+
+        try:
+            # Try to use saved feature list and scaler if available
+            features_path = os.path.join(args.trained_models_output_dir, f"{league_name}_features.json")
+            scaler_path = os.path.join(args.trained_models_output_dir, f"{league_name}_scaler.pkl")
+            
+            if os.path.exists(features_path) and os.path.exists(scaler_path):
+                # Load saved feature list and scaler
+                with open(features_path, 'r') as hf:
+                    feature_names = json.load(hf)
+                with open(scaler_path, 'rb') as sf:
+                    scaler = pickle.load(sf)
+                
+                # Ensure all expected features are present in df; add missing ones as NaN
+                missing = [f for f in feature_names if f not in df.columns]
+                if missing:
+                    print(f"⚠ Warning: Missing features in data for {league_name}: {missing}. Filling with NaN.")
+                    for m in missing:
+                        df[m] = float('nan')
+                
+                # Use the exact same features and scaler as training
+                X_df = df[feature_names].fillna(df[feature_names].mean())
+                y = df['Over2.5'].astype(int)
+                X = scaler.transform(X_df)  # Use saved scaler, don't fit a new one
+            else:
+                # Fallback to original behavior
+                X, y, _ = prepare_data(df, target='Over2.5')
+
+            # Debug info before prediction
+            print(f"X shape: {X.shape}")
+            if hasattr(model, 'estimators_'):
+                expected_counts = []
+                for name, est in model.estimators_:
+                    if hasattr(est, 'coef_'):
+                        try:
+                            expected_counts.append((name, est.coef_.shape[1]))
+                        except Exception:
+                            expected_counts.append((name, None))
+                    else:
+                        expected_counts.append((name, None))
+                print(f"Estimator expected feature counts: {expected_counts}")
+
+            # Backtest
+            summary, y_true, y_pred, y_proba = backtest_model(model, X, y, league_name, target='Over2.5', n_splits=5)
+            all_results.append(summary)
+            print_backtest_results(summary)
+
+            # Save results
+            save_backtest_results(summary, args.backtest_output_dir, league_name, 'goals')
+        except ValueError as e:
+            print(f"Error while backtesting {league_name}: {e}")
+            print(f"  - X shape: {X.shape}")
+            if 'feature_names' in locals():
+                print(f"  - feature_names length: {len(feature_names)}")
+            if hasattr(model, 'estimators_'):
+                for name, est in model.estimators_:
+                    if hasattr(est, 'coef_'):
+                        try:
+                            print(f"  - estimator {name} expects {est.coef_.shape[1]} features")
+                        except Exception:
+                            print(f"  - estimator {name} has no coef_ attribute or could not read it")
+            raise
     
     # Backtest corner models
     print("\n" + "="*70)

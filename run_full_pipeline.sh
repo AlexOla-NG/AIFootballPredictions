@@ -13,8 +13,8 @@ NC='\033[0m' # No Color
 
 # Configuration
 VENV_PATH=".venv"
-LEAGUES="E0 I1 SP1 F1 D1"
-SEASONS="2526 2425 2324 2223"
+LEAGUES="E0 I1 SP1 F1 D1 E1 N1"
+SEASONS="2526 2425 2324"
 NUM_FEATURES=20
 CLUSTERING_THRESHOLD=0.5
 N_SPLITS=10
@@ -28,24 +28,35 @@ MODELS_DIR="models"
 NEXT_MATCHES_FILE="data/next_matches.json"
 PREDICTIONS_FILE="final_predictions_with_corners.txt"
 
-# Check if virtual environment exists
-if [ ! -d "$VENV_PATH" ]; then
-    echo -e "${YELLOW}Virtual environment not found. Please create it first with:${NC}"
-    echo "conda env create -f conda/aifootball_predictions.yaml"
-    echo "conda activate aifootball_predictions"
+# Model to train
+GOALS_MODEL="Over2.5"
+CORNERS_MODEL="Corner"
+
+# Check if virtual environment exists (support .venv or conda env)
+CONDA_ENV_NAME="aifootball_predictions"
+if [ -d "$VENV_PATH" ]; then
+    PY_BIN="$VENV_PATH/bin"
+    PIP_CMD="$PY_BIN/pip"
+    PY_CMD="$PY_BIN/python"
+    echo -e "${GREEN}Using virtualenv at $VENV_PATH${NC}"
+elif command -v conda >/dev/null 2>&1 && conda env list | awk '{print $1}' | grep -qx "$CONDA_ENV_NAME"; then
+    PIP_CMD="conda run -n $CONDA_ENV_NAME --no-capture-output pip"
+    PY_CMD="conda run -n $CONDA_ENV_NAME --no-capture-output python"
+    echo -e "${GREEN}Using conda environment '$CONDA_ENV_NAME' (invoking via 'conda run')${NC}"
+else
+    echo -e "${YELLOW}Virtual environment not found. Please create it first with one of the following:${NC}"
+    echo "  conda env create -f conda/aifootball_predictions.yaml && conda activate $CONDA_ENV_NAME"
+    echo "  OR: python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
     exit 1
 fi
-
-# Activate virtual environment
-source "$VENV_PATH/bin/activate"
 
 echo -e "${BLUE}================================${NC}"
 echo -e "${BLUE}AIFootballPredictions Pipeline${NC}"
 echo -e "${BLUE}================================${NC}\n"
 
 # Step 0: Install missing dependencies
-echo -e "${GREEN}Step 0: Installing dependencies from requirements.txt...${NC}"
-.venv/bin/pip install -r requirements.txt -q
+echo -e "${GREEN}Step 0: Installing dependencies from requirements.txt...${NC}"x
+$PIP_CMD install -r requirements.txt -q
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ Dependencies installed${NC}\n"
@@ -56,7 +67,7 @@ fi
 
 # Step 1: Data Acquisition
 echo -e "${GREEN}Step 1: Acquiring historical match data...${NC}"
-.venv/bin/python scripts/data_acquisition.py \
+$PY_CMD scripts/data_acquisition.py \
     --leagues $LEAGUES \
     --seasons $SEASONS \
     --raw_data_output_dir $RAW_DATA_DIR
@@ -70,7 +81,7 @@ fi
 
 # Step 2: Data Preprocessing
 echo -e "${GREEN}Step 2: Preprocessing data and engineering features...${NC}"
-.venv/bin/python scripts/data_preprocessing.py \
+$PY_CMD scripts/data_preprocessing.py \
     --raw_data_input_dir $RAW_DATA_DIR \
     --processed_data_output_dir $PROCESSED_DATA_DIR \
     --num_features $NUM_FEATURES \
@@ -85,12 +96,13 @@ fi
 
 # Step 3: Train Goals Models
 echo -e "${GREEN}Step 3: Training goals prediction models (Over/Under 2.5)...${NC}"
-.venv/bin/python scripts/train_models.py \
+$PY_CMD scripts/train_models.py \
     --processed_data_input_dir $PROCESSED_DATA_DIR \
     --trained_models_output_dir $MODELS_DIR \
     --metric_choice $METRIC_CHOICE \
     --n_splits $N_SPLITS \
-    --voting $VOTING
+    --voting $VOTING \
+    --model_to_train $GOALS_MODEL
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ Goals model training completed${NC}\n"
@@ -101,12 +113,13 @@ fi
 
 # Step 4: Train Corner Models
 echo -e "${GREEN}Step 4: Training corner prediction models (Over/Under 10.5)...${NC}"
-.venv/bin/python scripts/train_corner_models.py \
+$PY_CMD scripts/train_models.py \
     --processed_data_input_dir $PROCESSED_DATA_DIR \
     --trained_models_output_dir $MODELS_DIR \
     --metric_choice $METRIC_CHOICE \
     --n_splits $N_SPLITS \
-    --voting $VOTING
+    --voting $VOTING \
+    --model_to_train $CORNERS_MODEL
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ Corner model training completed${NC}\n"
@@ -117,7 +130,7 @@ fi
 
 # Step 5: Acquire Next Matches
 echo -e "${GREEN}Step 5: Acquiring next matches data...${NC}"
-.venv/bin/python scripts/acquire_next_matches.py \
+$PY_CMD scripts/acquire_next_matches.py \
     --get_teams_names_dir $PROCESSED_DATA_DIR \
     --next_matches_output_file $NEXT_MATCHES_FILE
 
@@ -130,7 +143,7 @@ fi
 
 # Step 6: Make Predictions
 echo -e "${GREEN}Step 6: Making predictions (goals + corners)...${NC}"
-.venv/bin/python scripts/make_predictions_enhanced.py \
+$PY_CMD scripts/make_predictions_enhanced.py \
     --input_leagues_models_dir $MODELS_DIR \
     --input_data_predict_dir $PROCESSED_DATA_DIR \
     --final_predictions_out_file $PREDICTIONS_FILE \
@@ -146,7 +159,7 @@ fi
 
 # Step 7: Evaluate Models
 echo -e "${GREEN}Step 7: Evaluating model performance...${NC}"
-.venv/bin/python scripts/evaluate_models.py \
+$PY_CMD scripts/evaluate_models.py \
     --processed_data_input_dir $PROCESSED_DATA_DIR \
     --trained_models_output_dir $MODELS_DIR \
     --metrics_output_dir metrics
@@ -160,7 +173,7 @@ fi
 
 # Step 8: Backtest Models
 echo -e "${GREEN}Step 8: Backtesting model predictions...${NC}"
-.venv/bin/python scripts/backtest_predictions.py \
+$PY_CMD scripts/backtest_predictions.py \
     --processed_data_input_dir $PROCESSED_DATA_DIR \
     --trained_models_output_dir $MODELS_DIR \
     --backtest_output_dir backtest_results
@@ -174,7 +187,7 @@ fi
 
 # Step 9: Track Metrics
 echo -e "${GREEN}Step 9: Tracking metrics over time...${NC}"
-.venv/bin/python scripts/track_metrics.py \
+$PY_CMD scripts/track_metrics.py \
     --metrics_dir metrics \
     --backtest_dir backtest_results \
     --output_file metrics_history.json
