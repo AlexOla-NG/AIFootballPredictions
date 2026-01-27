@@ -248,7 +248,8 @@ def get_next_matches(headers: dict, base_url: str) -> dict:
     """
     # get the current date, it will be useful to filter the matches
     # acquiring only the next true marches without incorrect data
-    current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    current_datetime = datetime.now()
+    current_date = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
     # Check if the API key is provided
     for var in env_vars_name:
@@ -273,23 +274,39 @@ def get_next_matches(headers: dict, base_url: str) -> dict:
 
                 current_matchday = data['matches'][0]['season']['currentMatchday']  # int
                 total_number_of_matches = len(data['matches'])  # int
-                # Get the last match day to avoid out of range error
-                last_match_day = data['matches'][-1]['matchday']
+                
+                print(f'{competition}: Current Matchday {current_matchday}, Total Matches {total_number_of_matches}')
 
-                # TODO A better management of the matchday is needed
-                next_matchday = current_matchday if current_matchday < last_match_day else last_match_day
+                # Find the next matchday that has unplayed matches
+                next_matchday_with_future_matches = None
+                for matchday in range(current_matchday, max(m['matchday'] for m in data['matches']) + 1):
+                    matchday_matches = [m for m in data['matches'] if m['matchday'] == matchday]
+                    # Check if this matchday has any future matches
+                    has_future_matches = any(
+                        datetime.strptime(m['utcDate'], '%Y-%m-%dT%H:%M:%SZ') >= current_datetime
+                        for m in matchday_matches
+                    )
+                    if has_future_matches:
+                        next_matchday_with_future_matches = matchday
+                        break
+                
+                if next_matchday_with_future_matches is None:
+                    print(f'{competition}: No upcoming matches found.')
+                    continue
 
-                print(f'{competition}: Current Matchday {current_matchday}, Total Matches {total_number_of_matches}')  
+                print(f'{competition}: Retrieving matches from Matchday {next_matchday_with_future_matches}')
 
+                # Retrieve all matches from the next matchday that are in the future
                 for match in data['matches']:
-                    if match['matchday'] != next_matchday:
+                    if match['matchday'] != next_matchday_with_future_matches:
                         continue
 
                     # Get the match date, home team, and away team
                     match_date = datetime.strptime(match['utcDate'], '%Y-%m-%dT%H:%M:%SZ')
                     formatted_date = match_date.strftime('%Y-%m-%d %H:%M:%S')
 
-                    if match_date < datetime.strptime(current_date, '%Y-%m-%d %H:%M:%S'):
+                    # Only get matches that haven't been played yet
+                    if match_date < current_datetime:
                         continue
 
                     home_team = match['homeTeam']['name']
