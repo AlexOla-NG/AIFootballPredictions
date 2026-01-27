@@ -1,30 +1,65 @@
 🎯 **AI Football Predictions: Goals & Corners** 🎯
 
 Check out the latest predictions for the upcoming football matches!
- PREDICTIONS DONE: 2025-12-18 
+ PREDICTIONS DONE: 2026-01-27 
 
 **Premier League**:
+- ⚽ **Brighton** 🆚 **Everton**: Over 2.5 Goals! 🔥 (95.78% chance) | Over 10.5 Corners: 91.93%
+- ⚽ **Wolves** 🆚 **Bournemouth**: Over 2.5 Goals! 🔥 (95.69% chance) | Over 10.5 Corners: 91.77%
+- ⚽ **Chelsea** 🆚 **West Ham**: Over 2.5 Goals! 🔥 (95.71% chance) | Over 10.5 Corners: 92.2%
+- ⚽ **Liverpool** 🆚 **Newcastle**: Over 2.5 Goals! 🔥 (95.58% chance) | Over 10.5 Corners: 91.7%
+- ⚽ **Aston Villa** 🆚 **Brentford**: Over 2.5 Goals! 🔥 (95.74% chance) | Over 10.5 Corners: 92.26%
+- ⚽ **Man United** 🆚 **Fulham**: Over 2.5 Goals! 🔥 (95.66% chance) | Over 10.5 Corners: 92.52%
+- ⚽ **Nott'm Forest** 🆚 **Crystal Palace**: Over 2.5 Goals! 🔥 (95.75% chance) | Over 10.5 Corners: 92.37%
+- ⚽ **Tottenham** 🆚 **Man City**: Over 2.5 Goals! 🔥 (95.52% chance) | Over 10.5 Corners: 92.2%
 
 **Serie A**:
+- ⚽ **Lazio** 🆚 **Genoa**: Over 2.5 Goals! 🔥 (92.83% chance) | Over 10.5 Corners: 92.48%
+- ⚽ **Napoli** 🆚 **Fiorentina**: Over 2.5 Goals! 🔥 (92.73% chance) | Over 10.5 Corners: 92.28%
+- ⚽ **Cagliari** 🆚 **Verona**: Over 2.5 Goals! 🔥 (93.15% chance) | Over 10.5 Corners: 92.47%
+- ⚽ **Torino** 🆚 **Lecce**: Over 2.5 Goals! 🔥 (93.09% chance) | Over 10.5 Corners: 92.17%
+- ⚽ **Como** 🆚 **Atalanta**: Over 2.5 Goals! 🔥 (92.92% chance) | Over 10.5 Corners: 92.2%
+- ⚽ **Parma** 🆚 **Juventus**: Over 2.5 Goals! 🔥 (92.81% chance) | Over 10.5 Corners: 92.45%
+- ⚽ **Udinese** 🆚 **Roma**: Over 2.5 Goals! 🔥 (92.98% chance) | Over 10.5 Corners: 92.41%
+- ⚽ **Bologna** 🆚 **Milan**: Over 2.5 Goals! 🔥 (92.73% chance) | Over 10.5 Corners: 91.85%
 
 **Bundesliga**:
-- ⚽ **Dortmund** 🆚 **M'gladbach**: Over 2.5 Goals! 🔥 (89.76% chance) | Under 10.5 Corners: 57.94%
-- ⚽ **Stuttgart** 🆚 **Hoffenheim**: Over 2.5 Goals! 🔥 (89.76% chance) | Under 10.5 Corners: 59.71%
-- ⚽ **Wolfsburg** 🆚 **Freiburg**: Over 2.5 Goals! 🔥 (89.63% chance) | Under 10.5 Corners: 59.12%
-- ⚽ **Augsburg** 🆚 **Werder Bremen**: Over 2.5 Goals! 🔥 (89.84% chance) | Under 10.5 Corners: 59.79%
-- ⚽ **RB Leipzig** 🆚 **Leverkusen**: Over 2.5 Goals! 🔥 (89.76% chance) | Under 10.5 Corners: 60.14%
-- ⚽ **Mainz** 🆚 **St Pauli**: Over 2.5 Goals! 🔥 (89.92% chance) | Over 10.5 Corners: 63.84%
-- ⚽ **Heidenheim** 🆚 **Bayern Munich**: Over 2.5 Goals! 🔥 (89.64% chance) | Under 10.5 Corners: 59.47%
+- ⚽ **Ein Frankfurt** 🆚 **Leverkusen**: Over 2.5 Goals! 🔥 (96.61% chance) | Over 10.5 Corners: 75.57%
+- ⚽ **RB Leipzig** 🆚 **Mainz**: Over 2.5 Goals! 🔥 (96.73% chance) | Over 10.5 Corners: 68.98%
+- ⚽ **Werder Bremen** 🆚 **M'gladbach**: Over 2.5 Goals! 🔥 (96.61% chance) | Over 10.5 Corners: 83.61%
+- ⚽ **Hoffenheim** 🆚 **Union Berlin**: Over 2.5 Goals! 🔥 (96.61% chance) | Over 10.5 Corners: 84.18%
+- ⚽ **Augsburg** 🆚 **St Pauli**: Over 2.5 Goals! 🔥 (96.73% chance) | Over 10.5 Corners: 85.18%
+- ⚽ **Stuttgart** 🆚 **Freiburg**: Over 2.5 Goals! 🔥 (96.73% chance) | Over 10.5 Corners: 71.35%
+- ⚽ **Dortmund** 🆚 **Heidenheim**: Over 2.5 Goals! 🔥 (96.73% chance) | Over 10.5 Corners: 79.11%
 
 **La Liga**:
+- ⚽ **Espanol** 🆚 **Alaves**: Over 2.5 Goals! 🔥 (94.36% chance) | Over 10.5 Corners: 80.6%
+- ⚽ **Osasuna** 🆚 **Villarreal**: Over 2.5 Goals! 🔥 (95.64% chance) | Over 10.5 Corners: 80.47%
+- ⚽ **Real Madrid** 🆚 **Vallecano**: Over 2.5 Goals! 🔥 (94.8% chance) | Over 10.5 Corners: 77.69%
+- ⚽ **Betis** 🆚 **Valencia**: Over 2.5 Goals! 🔥 (95.37% chance) | Over 10.5 Corners: 80.34%
+- ⚽ **Getafe** 🆚 **Celta**: Over 2.5 Goals! 🔥 (94.7% chance) | Over 10.5 Corners: 80.54%
+- ⚽ **Ath Bilbao** 🆚 **Sociedad**: Over 2.5 Goals! 🔥 (94.74% chance) | Over 10.5 Corners: 80.3%
+- ⚽ **Mallorca** 🆚 **Sevilla**: Over 2.5 Goals! 🔥 (94.7% chance) | Over 10.5 Corners: 80.54%
 
 **Ligue 1**:
-- ⚽ **Toulouse** 🆚 **Lens**: Over 2.5 Goals! 🔥 (92.72% chance) | Over 10.5 Corners: 79.99%
-- ⚽ **Monaco** 🆚 **Lyon**: Over 2.5 Goals! 🔥 (92.8% chance) | Over 10.5 Corners: 80.05%
-- ⚽ **Nice** 🆚 **Strasbourg**: Over 2.5 Goals! 🔥 (92.96% chance) | Over 10.5 Corners: 80.11%
-- ⚽ **Lille** 🆚 **Rennes**: Over 2.5 Goals! 🔥 (92.72% chance) | Over 10.5 Corners: 80.11%
-- ⚽ **Marseille** 🆚 **Nantes**: Over 2.5 Goals! 🔥 (93.13% chance) | Over 10.5 Corners: 80.11%
-- ⚽ **Le Havre** 🆚 **Angers**: Over 2.5 Goals! 🔥 (92.74% chance) | Over 10.5 Corners: 80.11%
-- ⚽ **Brest** 🆚 **Auxerre**: Over 2.5 Goals! 🔥 (92.96% chance) | Over 10.5 Corners: 80.09%
-- ⚽ **Paris SG** 🆚 **Paris FC**: Over 2.5 Goals! 🔥 (93.21% chance) | Over 10.5 Corners: 80.08%
+- ⚽ **Lens** 🆚 **Le Havre**: Over 2.5 Goals! 🔥 (93.3% chance) | Over 10.5 Corners: 83.18%
+- ⚽ **Paris FC** 🆚 **Marseille**: Over 2.5 Goals! 🔥 (92.97% chance) | Over 10.5 Corners: 83.94%
+- ⚽ **Monaco** 🆚 **Rennes**: Over 2.5 Goals! 🔥 (92.7% chance) | Over 10.5 Corners: 84.93%
+- ⚽ **Lyon** 🆚 **Lille**: Over 2.5 Goals! 🔥 (92.97% chance) | Over 10.5 Corners: 84.14%
+- ⚽ **Toulouse** 🆚 **Auxerre**: Over 2.5 Goals! 🔥 (92.72% chance) | Over 10.5 Corners: 82.09%
+- ⚽ **Nice** 🆚 **Brest**: Over 2.5 Goals! 🔥 (92.97% chance) | Over 10.5 Corners: 84.89%
+- ⚽ **Angers** 🆚 **Metz**: Over 2.5 Goals! 🔥 (93.37% chance) | Over 10.5 Corners: 82.11%
+- ⚽ **Strasbourg** 🆚 **Paris SG**: Over 2.5 Goals! 🔥 (92.62% chance) | Over 10.5 Corners: 84.97%
+
+**English Championship**:
+- ⚽ **Bristol City** 🆚 **Derby**: Over 2.5 Goals! 🔥 (89.14% chance) | Over 10.5 Corners: 92.11%
+- ⚽ **Leicester** 🆚 **Charlton**: Over 2.5 Goals! 🔥 (88.9% chance) | Over 10.5 Corners: 90.01%
+- ⚽ **Stoke** 🆚 **Southampton**: Over 2.5 Goals! 🔥 (88.98% chance) | Over 10.5 Corners: 92.04%
+- ⚽ **Ipswich** 🆚 **Preston**: Over 2.5 Goals! 🔥 (88.87% chance) | Over 10.5 Corners: 89.36%
+- ⚽ **Middlesbrough** 🆚 **Norwich**: Over 2.5 Goals! 🔥 (89.06% chance) | Over 10.5 Corners: 89.71%
+- ⚽ **Portsmouth** 🆚 **West Brom**: Over 2.5 Goals! 🔥 (88.78% chance) | Over 10.5 Corners: 90.09%
+- ⚽ **QPR** 🆚 **Coventry**: Over 2.5 Goals! 🔥 (88.89% chance) | Over 10.5 Corners: 86.36%
+- ⚽ **Watford** 🆚 **Swansea**: Over 2.5 Goals! 🔥 (88.89% chance) | Over 10.5 Corners: 88.06%
+
+**Eredivisie**:
 

@@ -63,13 +63,18 @@ def load_league_data(filepath: str) -> pd.DataFrame:
     print(f"Loading data from {filepath}...")
     return pd.read_csv(filepath)
 
-def prepare_row_to_predict(home_team_df: pd.DataFrame, away_team_df: pd.DataFrame, numeric_columns: list) -> pd.DataFrame:
+def prepare_row_to_predict(
+    home_team_df: pd.DataFrame,
+    away_team_df: pd.DataFrame,
+    numeric_columns: list,
+    lookback_matches: int = 5
+) -> pd.DataFrame:
     """Prepare a single row for prediction by averaging team statistics."""
     row_to_predict = pd.DataFrame(columns=numeric_columns)
     row_to_predict.loc[0] = [None] * len(row_to_predict.columns)
 
-    home_team_final_df = home_team_df.head(5)[numeric_columns]
-    away_team_final_df = away_team_df.head(5)[numeric_columns]
+    home_team_final_df = home_team_df.head(lookback_matches)[numeric_columns]
+    away_team_final_df = away_team_df.head(lookback_matches)[numeric_columns]
 
     for column in row_to_predict.columns:
         if column in HOME_TEAM_FEATURES:
@@ -77,13 +82,21 @@ def prepare_row_to_predict(home_team_df: pd.DataFrame, away_team_df: pd.DataFram
         elif column in AWAY_TEAM_FEATURES:
             row_to_predict.loc[0, column] = away_team_final_df[column].mean()
         else:
-            row_to_predict.loc[0, column] = (away_team_final_df[column].mean() + home_team_final_df[column].mean()) / 2
+            row_to_predict.loc[0, column] = (
+                away_team_final_df[column].mean() + 
+                home_team_final_df[column].mean()
+            ) / 2
 
     return row_to_predict
 
 def make_predictions(league: str, goals_model, corners_model, league_data: pd.DataFrame, competitions: dict, predict_corners: bool, models_dir: str = 'models') -> str:
     """Make predictions for a league (goals and optionally corners)."""
     league_section = ""
+
+    # Align numeric_columns with saved feature lists if available
+    goals_feature_list = load_feature_list(models_dir, league, corner=False)
+    corners_feature_list = load_feature_list(models_dir, league, corner=True)
+
     for competition_league, competitions_info in competitions.items():
         if competition_league == league:
             league_section = f"**{competitions_info['name']}**:\n"
@@ -102,10 +115,6 @@ def make_predictions(league: str, goals_model, corners_model, league_data: pd.Da
                     numeric_columns.remove('Over2.5')
                 if 'OverUnder10.5Corners' in numeric_columns:
                     numeric_columns.remove('OverUnder10.5Corners')
-
-                # Align numeric_columns with saved feature lists if available
-                goals_feature_list = load_feature_list(models_dir, league, corner=False)
-                corners_feature_list = load_feature_list(models_dir, league, corner=True)
 
                 if goals_feature_list:
                     # keep only features present in both CSV and the saved list, preserving the saved order
