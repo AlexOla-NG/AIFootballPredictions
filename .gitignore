@@ -16,11 +16,26 @@ images/*
 # Ignore all the .csv files in the data folder
 data/*/*.csv
 
+# Ignore processed and raw data directories
+data/processed/
+data/raw/
+
 # Ignore all the .json in the notebooks folder
 notebooks/*.json
 
 # Ignore all the models
 models/*
+
+# Ignore generated output directories
+backtest_results/
+metrics/
+
+# Ignore generated prediction files
+final_predictions*.txt
+data/final_predictions*.txt
+
+# Ignore generated chart images
+*.png
 
 # Ignore all the videos
 videos/*
