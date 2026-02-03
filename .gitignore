@@ -37,6 +37,12 @@ data/final_predictions*.txt
 # Ignore generated chart images
 *.png
 
+# Ignore generated history and output files
+*_history.csv
+*_history.json
+data/next_matches.json
+run_full_pipeline.sh
+
 # Ignore all the videos
 videos/*
 
