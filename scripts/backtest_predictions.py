@@ -367,7 +367,7 @@ def main():
     
     for league_name, df in data.items():
         print(f"Processing league: {league_name}")
-        model_path = os.path.join(args.trained_models_output_dir, f"{league_name}_voting_classifier.pkl")
+        model_path = os.path.join(args.trained_models_output_dir, f"{league_name}_over2.5_voting_classifier.pkl")
         
         if not os.path.exists(model_path):
             print(f"⚠ Model not found for {league_name}")
@@ -406,9 +406,9 @@ def main():
 
             # Debug info before prediction
             print(f"X shape: {X.shape}")
-            if hasattr(model, 'estimators_'):
+            if hasattr(model, 'named_estimators_'):
                 expected_counts = []
-                for name, est in model.estimators_:
+                for name, est in model.named_estimators_.items():
                     if hasattr(est, 'coef_'):
                         try:
                             expected_counts.append((name, est.coef_.shape[1]))
@@ -417,6 +417,12 @@ def main():
                     else:
                         expected_counts.append((name, None))
                 print(f"Estimator expected feature counts: {expected_counts}")
+            elif hasattr(model, 'coef_'):
+                # Single model case
+                try:
+                    print(f"Single model feature count: {model.coef_.shape[1]}")
+                except Exception:
+                    print("Single model feature count: unknown")
 
             # Backtest
             summary, y_true, y_pred, y_proba = backtest_model(model, X, y, league_name, target='Over2.5', n_splits=5)
@@ -430,8 +436,8 @@ def main():
             print(f"  - X shape: {X.shape}")
             if 'feature_names' in locals():
                 print(f"  - feature_names length: {len(feature_names)}")
-            if hasattr(model, 'estimators_'):
-                for name, est in model.estimators_:
+            if hasattr(model, 'named_estimators_'):
+                for name, est in model.named_estimators_.items():
                     if hasattr(est, 'coef_'):
                         try:
                             print(f"  - estimator {name} expects {est.coef_.shape[1]} features")
