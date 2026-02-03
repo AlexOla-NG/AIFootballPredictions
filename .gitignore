@@ -41,7 +41,6 @@ data/final_predictions*.txt
 *_history.csv
 *_history.json
 data/next_matches.json
-run_full_pipeline.sh
 
 # Ignore all the videos
 videos/*
