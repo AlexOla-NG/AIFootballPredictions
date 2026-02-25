@@ -249,7 +249,6 @@ def get_next_matches(headers: dict, base_url: str) -> dict:
     # get the current date, it will be useful to filter the matches
     # acquiring only the next true marches without incorrect data
     current_datetime = datetime.now()
-    current_date = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
     # Check if the API key is provided
     for var in env_vars_name:
@@ -277,24 +276,19 @@ def get_next_matches(headers: dict, base_url: str) -> dict:
                 
                 print(f'{competition}: Current Matchday {current_matchday}, Total Matches {total_number_of_matches}')
 
-                # Find the next matchday that has unplayed matches
-                next_matchday_with_future_matches = None
-                for matchday in range(current_matchday, max(m['matchday'] for m in data['matches']) + 1):
-                    matchday_matches = [m for m in data['matches'] if m['matchday'] == matchday]
-                    # Check if this matchday has any future matches
-                    has_future_matches = any(
-                        datetime.strptime(m['utcDate'], '%Y-%m-%dT%H:%M:%SZ') >= current_datetime
-                        for m in matchday_matches
-                    )
-                    if has_future_matches:
-                        next_matchday_with_future_matches = matchday
-                        break
-                
-                if next_matchday_with_future_matches is None:
+                # identify all future matches regardless of matchday (this will catch postponed games)
+                future_matches = [m for m in data['matches']
+                                  if datetime.strptime(m['utcDate'], '%Y-%m-%dT%H:%M:%SZ') >= current_datetime]
+                if not future_matches:
                     print(f'{competition}: No upcoming matches found.')
                     continue
 
-                print(f'{competition}: Retrieving matches from Matchday {next_matchday_with_future_matches}')
+                # pick the matchday that contains the earliest future fixture
+                earliest_future_match = min(future_matches,
+                                             key=lambda m: datetime.strptime(m['utcDate'], '%Y-%m-%dT%H:%M:%SZ'))
+                next_matchday_with_future_matches = earliest_future_match['matchday']
+
+                print(f'{competition}: Retrieving matches from Matchday {next_matchday_with_future_matches} (earliest future date)')
 
                 # Retrieve all matches from the next matchday that are in the future
                 for match in data['matches']:
